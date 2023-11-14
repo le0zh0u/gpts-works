@@ -1,0 +1,11 @@
+# 忽略 venv 文件夹 
+venv/
+
+# 忽略所有包含 .pyc 后缀的文件 
+*.pyc
+
+# 忽略所有包含 .pyo 后缀的文件 
+*.pyo
+
+# 忽略 __pycache__ 目录 
+__pycache__/
