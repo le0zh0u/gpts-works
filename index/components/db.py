@@ -1,4 +1,4 @@
-from pony.orm import Database, set_sql_debug
+from pony.orm import Database, set_sql_debug, sql_debugging
 import os
 from urllib.parse import urlparse
 from components.log import log
@@ -16,11 +16,10 @@ def init_db():
         user=url.username,
         password=url.password,
         database=url.path[1:],
-        sslmode='require',
-        options='endpoint=ep-twilight-queen-56021949'
+        charset="utf8mb4"
     )
     db.generate_mapping(create_tables=True)
 
-    set_sql_debug(True)
+    # set_sql_debug(True)
 
     log.info("init db ok")

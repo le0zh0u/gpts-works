@@ -25,6 +25,9 @@ export async function createTable() {
     author_name VARCHAR(50),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    welcome_message VARCHAR(512),
+    tools VARCHAR(255),
+    prompt_starters VARCHAR(2048),
     detail JSON 
 );`);
 
@@ -35,9 +38,9 @@ export async function insertRow(gpts: Gpts) {
   // 使用参数化查询
   const [res] = await pool.execute(`
     INSERT INTO gpts 
-    (uuid, org_id, name, description, avatar_url, short_url, author_id, author_name, created_at, updated_at, detail) 
+    (uuid, org_id, name, description, avatar_url, short_url, author_id, author_name, created_at, updated_at, welcome_message, detail) 
     VALUES 
-    (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
   `, [
     gpts.uuid, 
     gpts.org_id, 
@@ -49,6 +52,7 @@ export async function insertRow(gpts: Gpts) {
     gpts.author_name, 
     gpts.created_at, 
     gpts.updated_at, 
+    gpts.welcome_message,
     JSON.stringify(gpts.detail) // 确保 detail 是 JSON 字符串
   ]);
 
@@ -151,6 +155,7 @@ function formatGpts(row: any): Gpts {
     created_at: row.created_at, // 假设这里已经是字符串格式
     updated_at: row.updated_at, // 假设这里已经是字符串格式
     detail: row.detail, // 直接使用，假设已经是字符串或 undefined
+    welcome_message: row.welcome_message,
     visit_url: row.short_url ? "https://chat.openai.com/g/" + row.short_url : undefined
   };
 }

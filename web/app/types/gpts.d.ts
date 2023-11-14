@@ -9,6 +9,7 @@ export interface Gpts {
   author_name: string;
   created_at: string;
   updated_at: string;
+  welcome_message: string;
   detail?: string;
   visit_url?: string;
 }
