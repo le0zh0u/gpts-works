@@ -17,7 +17,7 @@ export default () => {
               "url('https://assets.website-files.com/63904f663019b0d8edf8d57c/6390526ac2a607693620c97b_Rectangle%2010.svg')",
           }}
         >
-          GPTs Works
+          ILoveGPTs
         </a>
         <div className="flex-1">
           <ul className="hidden md:flex float-right text-lg text-slate-700 mr-4 items-center">

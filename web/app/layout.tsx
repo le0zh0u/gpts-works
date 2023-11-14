@@ -9,11 +9,11 @@ import type { Metadata } from "next";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "GPTs Works - Third-party GPTs store",
+  title: "ILoveGPTs - Let everyone find the right GPTs",
   description:
-    "GPTs Works is a Third-party GPTs store. Support seach GPTs by chatting.",
+    "ILoveGPTs is a Third-party GPTs Collection. Let everyone find the right GPTs.",
   keywords:
-    "GPTs, GPTs store, GPTs Works, ChatGPT, OpenAI GPTs, vector search GPTs",
+    "GPTs, GPTs store, GPTs Works, ChatGPT, OpenAI GPTs, vector search GPTs, GPTs hunter, GPTshunter",
 };
 
 export default function RootLayout({
@@ -35,7 +35,7 @@ export default function RootLayout({
 
         <script
           defer
-          data-domain="gpts.works"
+          data-domain="ilovegpts.com"
           src="https://plausible.io/js/script.js"
         ></script>
       </body>

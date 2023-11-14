@@ -1,10 +1,20 @@
-import { QueryResultRow, sql } from "@vercel/postgres";
-
+// import { QueryResultRow, sql } from "@vercel/postgres";
+import mysql from 'mysql2/promise';
 import { Gpts } from "../types/gpts";
 
+const dbConfig = {
+  host: process.env.DB_HOST,
+  port: process.env.DB_PORT,
+  user: process.env.DB_USER,
+  password: process.env.DB_PASSWORD,
+  database: process.env.DB_NAME,
+};
+
+const pool = mysql.createPool(dbConfig);
+
 export async function createTable() {
-  const res = await sql`CREATE TABLE gpts (
-    id SERIAL PRIMARY KEY,
+  const res = await pool.execute(`CREATE TABLE gpts (
+    id INT AUTO_INCREMENT PRIMARY KEY,
     uuid VARCHAR(50) UNIQUE NOT NULL,
     org_id VARCHAR(50),
     name VARCHAR(50),
@@ -13,31 +23,45 @@ export async function createTable() {
     short_url VARCHAR(100),
     author_id VARCHAR(50),
     author_name VARCHAR(50),
-    created_at timestamptz,
-    updated_at timestamptz,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     detail JSON 
-);`;
+);`);
 
   return res;
 }
 
 export async function insertRow(gpts: Gpts) {
-  const res = await sql`INSERT INTO gpts 
+  // 使用参数化查询
+  const [res] = await pool.execute(`
+    INSERT INTO gpts 
     (uuid, org_id, name, description, avatar_url, short_url, author_id, author_name, created_at, updated_at, detail) 
     VALUES 
-    (${gpts.uuid}, ${gpts.org_id}, ${gpts.name}, ${gpts.description}, ${gpts.avatar_url}, ${gpts.short_url}, ${gpts.author_id}, ${gpts.author_name}, ${gpts.created_at}, ${gpts.updated_at}, ${gpts.detail})
-`;
+    (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+  `, [
+    gpts.uuid, 
+    gpts.org_id, 
+    gpts.name, 
+    gpts.description, 
+    gpts.avatar_url, 
+    gpts.short_url, 
+    gpts.author_id, 
+    gpts.author_name, 
+    gpts.created_at, 
+    gpts.updated_at, 
+    JSON.stringify(gpts.detail) // 确保 detail 是 JSON 字符串
+  ]);
 
   return res;
 }
 
 export async function getUuids(): Promise<string[]> {
-  const res = await sql`SELECT uuid FROM gpts`;
-  if (res.rowCount === 0) {
+  const [rows] = await pool.execute(`SELECT uuid FROM gpts`);
+   // 使用 rows.length 来判断行数
+   if (rows.length === 0) {
     return [];
   }
 
-  const { rows } = res;
   let uuids: string[] = [];
   rows.forEach((row) => {
     uuids.push(row.uuid);
@@ -47,15 +71,15 @@ export async function getUuids(): Promise<string[]> {
 }
 
 export async function getRows(last_id: number, limit: number): Promise<Gpts[]> {
-  const res =
-    await sql`SELECT * FROM gpts WHERE id > ${last_id} LIMIT ${limit} `;
-  if (res.rowCount === 0) {
+  const [rows] =
+    await pool.execute(`SELECT * FROM gpts WHERE id > ? LIMIT ?`, [last_id, limit]);
+
+  if (rows.length === 0) {
     return [];
   }
 
   const gpts: Gpts[] = [];
-  const { rows } = res;
-
+  
   rows.forEach((row) => {
     const gpt = formatGpts(row);
     gpts.push(gpt);
@@ -64,18 +88,15 @@ export async function getRows(last_id: number, limit: number): Promise<Gpts[]> {
   return gpts;
 }
 
-export async function getRandRows(
-  last_id: number,
-  limit: number
-): Promise<Gpts[]> {
-  const res =
-    await sql`SELECT * FROM gpts WHERE id > ${last_id} ORDER BY RANDOM() LIMIT ${limit}`;
-  if (res.rowCount === 0) {
+export async function getRandRows(last_id: number, limit: number): Promise<Gpts[]> {
+  
+  const [rows] = await pool.execute(`SELECT * FROM gpts WHERE id > ${last_id} ORDER BY RAND() LIMIT ${limit}`);
+  // 使用 rows.length 来判断行数
+  if (rows.length === 0) {
     return [];
   }
 
   const gpts: Gpts[] = [];
-  const { rows } = res;
 
   rows.forEach((row) => {
     const gpt = formatGpts(row);
@@ -86,32 +107,39 @@ export async function getRandRows(
 }
 
 export async function getCount(): Promise<number> {
-  const res = await sql`SELECT count(1) as count FROM gpts LIMIT 1`;
-  if (res.rowCount === 0) {
+  // 使用 MySQL 查询语法
+  const [rows] = await pool.execute('SELECT COUNT(*) AS count FROM gpts');
+
+  // 检查返回的数组是否为空
+  if (rows.length === 0) {
     return 0;
   }
 
-  const { rows } = res;
+  // 获取 count 值
   const row = rows[0];
-
   return row.count;
 }
 
 export async function findByUuid(uuid: string): Promise<Gpts | undefined> {
-  const res = await sql`SELECT * FROM gpts WHERE uuid = ${uuid} LIMIT 1`;
-  if (res.rowCount === 0) {
+  // 使用参数化查询
+  const [rows] = await pool.execute(`
+    SELECT * FROM gpts WHERE uuid = ? LIMIT 1
+  `, [uuid]);
+
+  // 使用 rows.length 来判断行数
+  if (rows.length === 0) {
     return undefined;
   }
 
-  const { rows } = res;
+  // 获取第一行数据
   const row = rows[0];
   const gpts = formatGpts(row);
 
   return gpts;
 }
 
-function formatGpts(row: QueryResultRow): Gpts {
-  const gpts: Gpts = {
+function formatGpts(row: any): Gpts {
+  return {
     uuid: row.uuid,
     org_id: row.org_id,
     name: row.name,
@@ -120,11 +148,9 @@ function formatGpts(row: QueryResultRow): Gpts {
     short_url: row.short_url,
     author_id: row.author_id,
     author_name: row.author_name,
-    created_at: row.created_at,
-    updated_at: row.updated_at,
-    visit_url: "https://chat.openai.com/g/" + row.short_url,
-    // detail: row.detail,
+    created_at: row.created_at, // 假设这里已经是字符串格式
+    updated_at: row.updated_at, // 假设这里已经是字符串格式
+    detail: row.detail, // 直接使用，假设已经是字符串或 undefined
+    visit_url: row.short_url ? "https://chat.openai.com/g/" + row.short_url : undefined
   };
-
-  return gpts;
 }
