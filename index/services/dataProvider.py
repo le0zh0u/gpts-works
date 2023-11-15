@@ -27,7 +27,7 @@ def import_from_gptshunter():
             elif result == 2:
                 update_count += 1
         except Exception as e:
-            log.info("save gpt failed, e - %s, name - %s, id - %s", e, gpts.name, gpts.id)
+            log.error("save gpt failed, e - %s, name - %s, id - %s", e, gpts.name, gpts.id)
             failed_count += 1
    
     log.info("save result, insert - %d, update - %d, failed - %d", insert_count, update_count, failed_count)
@@ -55,7 +55,7 @@ def import_from_gptsworks():
             elif result == 2:
                 update_count += 1
         except Exception as e:
-            log.info("save gpt failed, e - %s, name - %s, id - %s", e, gpts.name, gpts.id)
+            log.error("save gpt failed, e - %s, name - %s, id - %s", e, gpts.name, gpts.id)
             failed_count += 1
    
     log.info("save result, insert - %d, update - %d, failed - %d", insert_count, update_count, failed_count)
@@ -86,7 +86,7 @@ def import_from_gptshub():
                 update_count += 1
 
         except Exception as e:
-            log.info("save gpt failed, e - %s, name - %s, id - %s", e, gpts.name, gpts.id)
+            log.error("save gpt failed, e - %s, name - %s, id - %s", e, gpts.name, gpts.id)
             failed_count += 1
         # i = int(index * 100 / count)
         # print("Download progress: {}%: ".format(i), "▋" * (i // 2), end="")
