@@ -39,14 +39,17 @@ export default () => {
   };
 
   useEffect(() => {
-    fetchGpts();
+    if (typeof window !== 'undefined') {
+      // 执行浏览器中的操作
+      fetchGpts();
+    }
   }, []);
 
   return (
     <>
       <Brand count={gptsCount} />
       {/* <ProductHunt /> */}
-      <Search setGpts={setGpts} setLoading={setLoading} />
+      {/* <Search setGpts={setGpts} setLoading={setLoading} /> */}
       <GptsList gpts={gpts} loading={loading} />
     </>
   );

@@ -1,5 +1,5 @@
 "use client";
-
+import { Skeleton } from "@/components/ui/skeleton"
 import { Gpts } from "@/app/types/gpts";
 import { LazyLoadImage } from "react-lazy-load-image-component";
 import Link from "next/link";
@@ -20,6 +20,7 @@ export default ({ gpts, loading }: Props) => {
                 <Link href={`${item.visit_url}`} target="_blank" key={idx}>
                   <div className="mb-6 gap-6 overflow-hidden rounded-2xl border border-solid border-[#7e7e7e] bg-white p-8">
                     <div className="mb-4 flex flex-row">
+                    {/* ? (item.avatar_url != "null" ? item.avatar_url : "/logo.png" ) : "/logo.png" */}
                       <LazyLoadImage
                         src={item.avatar_url}
                         alt=""
@@ -41,7 +42,31 @@ export default ({ gpts, loading }: Props) => {
             })}
           </div>
         ) : (
-          <div className="mx-auto text-center">Loading data...</div>
+          // <div className="mx-auto text-center">
+          <div className="mb-8 gap-5 py-4 [column-count:1] md:mb-12 md:[column-count:2] lg:mb-16 lg:[column-count:3]">
+              <div className="flex items-center space-x-4">
+                <Skeleton className="h-12 w-12 rounded-full" />
+                <div className="space-y-2">
+                  <Skeleton className="h-4 w-[250px]" />
+                  <Skeleton className="h-4 w-[200px]" />
+                </div>
+              </div>
+              <div className="flex items-center space-x-4">
+                <Skeleton className="h-12 w-12 rounded-full" />
+                <div className="space-y-2">
+                  <Skeleton className="h-4 w-[250px]" />
+                  <Skeleton className="h-4 w-[200px]" />
+                </div>
+              </div>
+              <div className="flex items-center space-x-4">
+                <Skeleton className="h-12 w-12 rounded-full" />
+                <div className="space-y-2">
+                  <Skeleton className="h-4 w-[250px]" />
+                  <Skeleton className="h-4 w-[200px]" />
+                </div>
+              </div>
+            </div>
+          // </div>
         )}
       </div>
     </section>

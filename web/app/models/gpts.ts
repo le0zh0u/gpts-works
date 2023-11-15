@@ -144,12 +144,20 @@ export async function findByUuid(uuid: string): Promise<Gpts | undefined> {
 }
 
 function formatGpts(row: any): Gpts {
+
+  var image = row.avatar_url
+  if (image && image != "null") {
+
+  } else {
+    image = "/logo.png"
+  }
+
   return {
     uuid: row.uuid,
     org_id: row.org_id,
     name: row.name,
     description: row.description,
-    avatar_url: row.avatar_url,
+    avatar_url: image,//row.avatar_url,
     short_url: row.short_url,
     author_id: row.author_id,
     author_name: row.author_name,

@@ -17,6 +17,11 @@ export default () => {
               "url('https://assets.website-files.com/63904f663019b0d8edf8d57c/6390526ac2a607693620c97b_Rectangle%2010.svg')",
           }}
         >
+          {/* <img
+        src="/logo.svg"
+        alt=""
+        className="text-slate-900 mr-4 inline-block h-16 w-16 object-cover rounded-full"
+      /> */}
           ILoveGPTs
         </a>
         <div className="flex-1">
