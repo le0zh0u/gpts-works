@@ -14,35 +14,44 @@ class Gpts:
     # prompt_starters
     # ["starters"]
 
-    def __init__(self, v) -> None:
-        self.uuid = v["data"]["gizmo"]["id"]
-        self.org_id = v["data"]["gizmo"]["organization_id"]
-        self.name = v["data"]["gizmo"]["display"]["name"]
-        self.description = v["data"]["gizmo"]["display"]["description"]
-        self.avatar_url = v["data"]["gizmo"]["display"]["profile_picture_url"]
-        self.short_url = v["data"]["gizmo"]["short_url"]
-        self.author_id = v["data"]["gizmo"]["author"]["user_id"]
-        self.author_name = v["data"]["gizmo"]["author"]["display_name"]
-        self.created_at = v["created_at"]
-        self.updated_at = v["data"]["gizmo"]["updated_at"]
-        #self.welcome_message = v["data"]["gizmo"]["updated_at"]
+    def __init__(self, **kwargs):
+        if 'gptshubDTO' in kwargs:
+            self._init_from_gptshubDTO(kwargs['gptshubDTO'])
+        elif 'gptsworksDTO' in kwargs:
+            self._init_from_gptsworksDTO(kwargs['gptsworksDTO'])
+        elif 'gptshunterDTO' in kwargs:
+            self._init_from_gptshunterDTO(kwargs['gptshunterDTO'])
+        # 其他初始化逻辑
 
-    def __init__(self, id, uuid, name, description, author_id, author_name, welcome_message, tools, prompt_starters, detail=None, avatar_url=None, short_url=None, org_id=None):
-        self.id = id
-        self.uuid = uuid
-        self.org_id = org_id
-        self.name = name
-        self.description = description
-        self.avatar_url = avatar_url
-        self.short_url = short_url
-        self.author_id = author_id
-        self.author_name = author_name
-        self.welcome_message = welcome_message
-        self.tools = tools
-        self.prompt_starters = prompt_starters
+    # def __init__(self, v) -> None:
+    #     self.uuid = v["data"]["gizmo"]["id"]
+    #     self.org_id = v["data"]["gizmo"]["organization_id"]
+    #     self.name = v["data"]["gizmo"]["display"]["name"]
+    #     self.description = v["data"]["gizmo"]["display"]["description"]
+    #     self.avatar_url = v["data"]["gizmo"]["display"]["profile_picture_url"]
+    #     self.short_url = v["data"]["gizmo"]["short_url"]
+    #     self.author_id = v["data"]["gizmo"]["author"]["user_id"]
+    #     self.author_name = v["data"]["gizmo"]["author"]["display_name"]
+    #     self.created_at = v["created_at"]
+    #     self.updated_at = v["data"]["gizmo"]["updated_at"]
+    #     #self.welcome_message = v["data"]["gizmo"]["updated_at"]
+
+    # def __init__(self, id, uuid, name, description, author_id, author_name, welcome_message, tools, prompt_starters, detail=None, avatar_url=None, short_url=None, org_id=None):
+    #     self.id = id
+    #     self.uuid = uuid
+    #     self.org_id = org_id
+    #     self.name = name
+    #     self.description = description
+    #     self.avatar_url = avatar_url
+    #     self.short_url = short_url
+    #     self.author_id = author_id
+    #     self.author_name = author_name
+    #     self.welcome_message = welcome_message
+    #     self.tools = tools
+    #     self.prompt_starters = prompt_starters
         # self.detail = detail
 
-    def __init__(self, gptshubDTO:GptsHubGptsDTO):
+    def _init_from_gptshubDTO(self, gptshubDTO:GptsHubGptsDTO):
         #self.tags = tags
         self.uuid = gptshubDTO.id
         self.org_id = ""
@@ -58,7 +67,7 @@ class Gpts:
         # self.created_at = gptshubDTO.updated_at
         # self.updated_at = gptshubDTO.updated_at
 
-    def __init__(self, gptsworksDTO: GptsWorksGptsDTO):
+    def _init_from_gptsworksDTO(self, gptsworksDTO: GptsWorksGptsDTO):
         self.uuid = gptsworksDTO.uuid
         self.org_id = gptsworksDTO.org_id
         self.name = gptsworksDTO.name
@@ -74,7 +83,7 @@ class Gpts:
         self.tools = None
         self.prompt_starters = None
 
-    def __init__(self, gptshunterDTO: GptsHunterGptsDTO):
+    def _init_from_gptshunterDTO(self, gptshunterDTO: GptsHunterGptsDTO):
 
         gpt_unique_id = gptshunterDTO.gpt_unique_id
         parts = gpt_unique_id.split('-')
@@ -88,7 +97,7 @@ class Gpts:
             self.avatar_url = None
         else:
             self.avatar_url = image
-            
+
         self.short_url = gpt_unique_id
         self.author_id = None
         if gptshunterDTO.author is None or gptshunterDTO.author == "--":
