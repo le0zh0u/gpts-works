@@ -1,10 +1,11 @@
 // import { QueryResultRow, sql } from "@vercel/postgres";
 import mysql from 'mysql2/promise';
+import { RowDataPacket } from 'mysql2';
 import { Gpts } from "../types/gpts";
 
 const dbConfig = {
   host: process.env.DB_HOST,
-  port: process.env.DB_PORT,
+  port: process.env.DB_PORT ? parseInt(process.env.DB_PORT, 13306) : 3306,
   user: process.env.DB_USER,
   password: process.env.DB_PASSWORD,
   database: process.env.DB_NAME,
@@ -60,7 +61,7 @@ export async function insertRow(gpts: Gpts) {
 }
 
 export async function getUuids(): Promise<string[]> {
-  const [rows] = await pool.execute(`SELECT uuid FROM gpts`);
+  const rows = await pool.execute(`SELECT uuid FROM gpts`) as RowDataPacket[];
    // 使用 rows.length 来判断行数
    if (rows.length === 0) {
     return [];
@@ -75,8 +76,8 @@ export async function getUuids(): Promise<string[]> {
 }
 
 export async function getRows(last_id: number, limit: number): Promise<Gpts[]> {
-  const [rows] =
-    await pool.execute(`SELECT * FROM gpts WHERE id > ? LIMIT ?`, [last_id, limit]);
+  const rows =
+    await pool.execute(`SELECT * FROM gpts WHERE id > ? LIMIT ?`, [last_id, limit]) as RowDataPacket[];
 
   if (rows.length === 0) {
     return [];
@@ -94,7 +95,7 @@ export async function getRows(last_id: number, limit: number): Promise<Gpts[]> {
 
 export async function getRandRows(last_id: number, limit: number): Promise<Gpts[]> {
   
-  const [rows] = await pool.execute(`SELECT * FROM gpts WHERE id > ${last_id} ORDER BY RAND() LIMIT ${limit}`);
+  const rows = await pool.execute(`SELECT * FROM gpts WHERE id > ${last_id} ORDER BY RAND() LIMIT ${limit}`) as RowDataPacket[];
   // 使用 rows.length 来判断行数
   if (rows.length === 0) {
     return [];
@@ -112,7 +113,7 @@ export async function getRandRows(last_id: number, limit: number): Promise<Gpts[
 
 export async function getCount(): Promise<number> {
   // 使用 MySQL 查询语法
-  const [rows] = await pool.execute('SELECT COUNT(*) AS count FROM gpts');
+  const rows = await pool.execute('SELECT COUNT(*) AS count FROM gpts') as RowDataPacket[];
 
   // 检查返回的数组是否为空
   if (rows.length === 0) {
@@ -126,9 +127,9 @@ export async function getCount(): Promise<number> {
 
 export async function findByUuid(uuid: string): Promise<Gpts | undefined> {
   // 使用参数化查询
-  const [rows] = await pool.execute(`
+  const rows = await pool.execute(`
     SELECT * FROM gpts WHERE uuid = ? LIMIT 1
-  `, [uuid]);
+  `, [uuid]) as RowDataPacket[];
 
   // 使用 rows.length 来判断行数
   if (rows.length === 0) {
