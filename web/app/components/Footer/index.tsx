@@ -22,7 +22,7 @@ export default () => {
                 alt="image"
                 className="mr-3 inline-block"
               />
-              <p className="text-[#636262] max-[479px]:text-sm">me@idoubi.cc</p>
+              <p className="text-[#636262] max-[479px]:text-sm">hi@leozhou.me</p>
             </div>
           </div>
         </div>
@@ -36,6 +36,14 @@ export default () => {
               target="_blank"
             >
               GPTsHunter
+            </a>
+
+            <a
+              href="https://gpts.works/"
+              className="inline-block mx-2 py-1.5 pr-6 font-normal text-[#276EF1] transition hover:text-[#276EF1] sm:py-2 sm:pr-6 lg:pr-12"
+              target="_blank"
+            >
+              GPTs Works
             </a>
           </div>
           <div className="max-[991px]:flex-none">

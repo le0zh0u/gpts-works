@@ -5,6 +5,16 @@ export async function POST(req: Request) {
     if (req.body) {
       const params = await req.json();
       const { last_id, limit } = params;
+      if (limit > 50) {
+        return Response.json({
+          code: 0,
+          message: "ok",
+          data: {
+            rows: [],
+            count: 0,
+          },
+        });
+      }
 
       const rows = await getRandRows(last_id, limit);
       const count = await getCount();

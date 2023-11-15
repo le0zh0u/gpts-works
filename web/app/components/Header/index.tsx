@@ -43,7 +43,7 @@ export default () => {
                 GPTs
               </a>
             </li>
-            <li className="mx-4">
+            {/* <li className="mx-4">
               <a
                 href="https://github.com/all-in-aigc/gpts-works"
                 target="_blank"
@@ -51,10 +51,10 @@ export default () => {
               >
                 <BsGithub className="text-xl" />
               </a>
-            </li>
+            </li> */}
             <li className="mx-4">
               <a
-                href="https://x.com/idoubicc"
+                href="https://x.com/le0zh0u"
                 target="_blank"
                 className="hover:text-[#2752f4]"
               >
@@ -63,7 +63,7 @@ export default () => {
             </li>
           </ul>
         </div>
-        <a href="https://www.buymeacoffee.com/idoubi" target="_blank">
+        {/* <a href="https://www.buymeacoffee.com/idoubi" target="_blank">
           <svg
             width="27"
             height="39"
@@ -81,7 +81,7 @@ export default () => {
               fill="#0D0C22"
             ></path>
           </svg>
-        </a>
+        </a> */}
       </h1>
     </header>
   );
