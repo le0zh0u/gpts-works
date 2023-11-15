@@ -5,11 +5,29 @@ from services.search import search_gpts
 from utils.resp import resp_err, resp_ok, resp_data
 from utils.time import get_current_timestamp
 from models.gpts import get_gpts_from_db, update_gpts_index_time
-from services.dataProvider import import_from_gptshub
+from services.dataProvider import import_from_gptshub, import_from_gptsworks, import_from_gptshunter
 import os
 
-
 gpts_router = APIRouter()
+
+@gpts_router.get("/gpts/import/gptshunter")
+async def import_gpts_from_gptshunter(authorization: str = Header(None)):
+    try:
+        result = import_from_gptshunter()
+        return resp_data(result)
+    except Exception as e:
+        print("import gpts from gptshub failed:", e)
+        return resp_err(f"{e}")
+
+@gpts_router.get("/gpts/import/gtpsworks")
+async def import_gpts_from_gptsworks(authorization: str = Header(None)):
+    try:
+        result = import_from_gptsworks()
+        return resp_data(result)
+    except Exception as e:
+        print("import gpts from gptshub failed:", e)
+        return resp_err(f"{e}")
+
 
 @gpts_router.get("/gpts/import/gptshub")
 async def import_gpts_from_gptshub(authorization: str = Header(None)):
@@ -21,8 +39,8 @@ async def import_gpts_from_gptshub(authorization: str = Header(None)):
     #     return resp_err("Access Denied")
     
     try:
-        import_from_gptshub()
-        return resp_ok("ok")
+        result = import_from_gptshub()
+        return resp_data(result)
     except Exception as e:
         print("import gpts from gptshub failed:", e)
         return resp_err(f"{e}")

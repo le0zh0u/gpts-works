@@ -1,58 +1,98 @@
-
-import requests
-import json
 from models.gpts import save_gpt, Gpts
-from dtos.gptsHubGptsDTO import GptsHubGptsDTO
+from services.data_source.gpts_hub import fetch_gptshub_json
+from services.data_source.gpts_works import fetch_gptsworks_data_random
+from services.data_source.gpts_hunter import fetch_gptshunter_from_file
+import sys
+import time
 
-def get_gptshub_from_file():
-    print("start to read data from file")
-    with open('data/gptshub.json', 'r', encoding='utf-8') as file:
-        print("file opened")
-        data = json.load(file)
-        gpts = []
-        for v in data:
-            gpt = GptsHubGptsDTO(v)
-            print("gpts: ", gpt.name, gpt.id)
-            gpts.append(gpt)
+def import_from_gptshunter():
 
-        print("finished read data")
-        return gpts
+    gptsList = fetch_gptshunter_from_file()
+    if gptsList is None or len(gptsList) == 0:
+        return {"count":0}
+    count = len(gptsList)
+    print("get gptsList: count:", count)
 
-def fetch_gptshub_json():
-    url = "https://raw.githubusercontent.com/lencx/GPTHub/main/gpthub.json"
-    response = requests.get(url)
-    response.raise_for_status()  # 确保响应状态是200
+    # save gpts
+    insert_count = 0
+    update_count = 0
+    failed_count = 0
+    for gpts in gptsList:
+        # print("gpts: ", gpts.name, gpts.uuid)
+        try: 
+            result = save_gpt(gpt=Gpts(gptshunterDTO=gpts))
+            if result == 1:
+                insert_count += 1
+            elif result == 2:
+                update_count += 1
+        except Exception as e:
+            print("save gpt failed", e, gpts.name, gpts.gpt_unique_id)
+            failed_count += 1
+   
+    print("save result, insert, update, failed", insert_count, update_count, failed_count)
+    return {"count": count, "insert_count": insert_count, "update_count": update_count, "failed_count": failed_count}
 
-    gpts = []
-    for v in response.json().get("gpts"):
-        gpt = GptsHubGptsDTO(v)
-        # print("gpts: ", gpt.name, gpt.id)
-        gpts.append(gpt)
-        
-    return gpts
+
+def import_from_gptsworks():
+    gptsList = fetch_gptsworks_data_random(last_id=0, limit=1000)
+    if gptsList is None or len(gptsList) == 0:
+        return {"count": 0}
+    
+    count = len(gptsList)
+    print("get gptsList: count:", count)
+
+    # save gpts
+    insert_count = 0
+    update_count = 0
+    failed_count = 0
+    for gpts in gptsList:
+        # print("gpts: ", gpts.name, gpts.uuid)
+        try: 
+            result = save_gpt(gpt=Gpts(gptsworksDTO=gpts))
+            if result == 1:
+                insert_count += 1
+            elif result == 2:
+                update_count += 1
+        except Exception as e:
+            print("save gpt failed", e, gpts.name, gpts.uuid)
+            failed_count += 1
+   
+    print("save result, insert, update, failed", insert_count, update_count, failed_count)
+    return {"count": count, "insert_count": insert_count, "update_count": update_count, "failed_count": failed_count}
+
 
 def import_from_gptshub():
     
     # get data
     gptsList = fetch_gptshub_json()
     if gptsList is None or len(gptsList) == 0:
-        return 
-    print("get gptsList: count:", len(gptsList))
+        return {"count": 0}
+    
+    count = len(gptsList)
+    print("get gptsList: count:", count)
 
     # save gpts
 
-    success_count = 0
+    insert_count = 0
+    update_count = 0
     failed_count = 0
-    for gpts in gptsList:
-
+    for index, gpts in enumerate(gptsList):
         try: 
-            save_gpt(gpt=Gpts(gptshubDTO=gpts))
-            success_count += 1
+            result = save_gpt(gpt=Gpts(gptshubDTO=gpts))
+            if result == 1:
+                insert_count += 1
+            elif result == 2:
+                update_count += 1
+
         except Exception as e:
             print("save gpt failed", e, gpts.name, gpts.id)
             failed_count += 1
+        # i = int(index * 100 / count)
+        # print("Download progress: {}%: ".format(i), "▋" * (i // 2), end="")
+        # sys.stdout.flush()
 
-    print("save result, success: {}, failed: {}", success_count, failed_count)
+    print("save result, insert, update, failed", insert_count, update_count, failed_count)
+    return {"count": count, "insert_count": insert_count, "update_count": update_count, "failed_count": failed_count}
 
 
 

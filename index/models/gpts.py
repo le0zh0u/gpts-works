@@ -2,9 +2,18 @@ import json
 from pony.orm import db_session, set_sql_debug, sql_debugging
 from components.db import db
 from dtos.gptsHubGptsDTO import GptsHubGptsDTO
-
+from dtos.gptsWorksGptsDTO import GptsWorksGptsDTO
+from dtos.gptsHunterGptsDTO import GptsHunterGptsDTO
 
 class Gpts:
+
+    # tools
+    # [1, 2, 3]
+    # ["DALL•E", "Browsing", "Data Analysis"]
+
+    # prompt_starters
+    # ["starters"]
+
     def __init__(self, v) -> None:
         self.uuid = v["data"]["gizmo"]["id"]
         self.org_id = v["data"]["gizmo"]["organization_id"]
@@ -46,13 +55,69 @@ class Gpts:
         self.welcome_message = gptshubDTO.welcome_message
         self.tools = gptshubDTO.tools
         self.prompt_starters = gptshubDTO.prompt_starters
-        self.created_at = gptshubDTO.updated_at
-        self.updated_at = gptshubDTO.updated_at
-    
+        # self.created_at = gptshubDTO.updated_at
+        # self.updated_at = gptshubDTO.updated_at
+
+    def __init__(self, gptsworksDTO: GptsWorksGptsDTO):
+        self.uuid = gptsworksDTO.uuid
+        self.org_id = gptsworksDTO.org_id
+        self.name = gptsworksDTO.name
+        self.description = gptsworksDTO.description
+        self.avatar_url = gptsworksDTO.avatar_url
+        self.short_url = gptsworksDTO.short_url
+        self.author_id = gptsworksDTO.author_id
+        self.author_name = gptsworksDTO.author_name
+        # self.created_at = gptsworksDTO.created_at
+        # self.updated_at = gptsworksDTO.updated_at
+        self.detail = gptsworksDTO.detail
+        self.welcome_message = None
+        self.tools = None
+        self.prompt_starters = None
+
+    def __init__(self, gptshunterDTO: GptsHunterGptsDTO):
+
+        gpt_unique_id = gptshunterDTO.gpt_unique_id
+        parts = gpt_unique_id.split('-')
+
+        self.uuid = '-'.join(parts[:2])        
+        self.org_id = None
+        self.name = gptshunterDTO.name
+        self.description = gptshunterDTO.desc
+        image = gptshunterDTO.image
+        if image is None or image == "null":
+            self.avatar_url = None
+        else:
+            self.avatar_url = image
+            
+        self.short_url = gpt_unique_id
+        self.author_id = None
+        if gptshunterDTO.author is None or gptshunterDTO.author == "--":
+            self.author_name = ""
+        else:
+            self.author_name = gptshunterDTO.author
+
+        self.detail = None
+
+        self.welcome_message = gptshunterDTO.welcome_message
+
+        self.prompt_starters = gptshunterDTO.starters
+
+        tools = []
+        for tool in gptshunterDTO.tools:
+            if tool == "python" or tool == "plugins_prototype":
+                tools.append(3)
+            elif tool == "browser":
+                tools.append(2)
+            elif tool == "dalle":
+                tools.append(1)
+            else:
+                print("GptsHunterGptsDTO -> Gpts, tools has unknown value ", tool)
+        
+        self.tools = list(set(tools))
 
 
 
-# def get_gpts_from_file(file_name: str):
+# def get_gpts_from_file(file_ame: str):
 #     with open(file_name, 'r', encoding='utf-8') as file:
 #         data = json.load(file)
 #         gpts = []
@@ -110,13 +175,17 @@ def save_gpt(gpt: Gpts):
             "UPDATE gpts SET name=$gpt.name, description=$gpt.description, "
             "author_id=$gpt.author_id, author_name=$gpt.author_name, welcome_message=$gpt.welcome_message, "
             "tools=$tools, prompt_starters=$prompt_starters, "
-            "avatar_url=$gpt.avatar_url, short_url=$gpt.short_url, org_id=$gpt.org_id, created_at=$gpt.created_at, updated_at=$gpt.updated_at "
+            "avatar_url=$gpt.avatar_url, short_url=$gpt.short_url, org_id=$gpt.org_id  "
             "WHERE uuid=$gpt.uuid"
         )
+
+        return 2
     else:
         # 插入新记录
         db.execute(
-            "INSERT INTO gpts (uuid, org_id, name, description, avatar_url, short_url, author_id, author_name, welcome_message, tools, prompt_starters, created_at, updated_at) "
-            "VALUES ($gpt.uuid, $gpt.org_id, $gpt.name, $gpt.description, $gpt.avatar_url, $gpt.short_url, $gpt.author_id, $gpt.author_name, $gpt.welcome_message, $tools, $prompt_starters, $gpt.created_at, $gpt.updated_at)"
+            "INSERT INTO gpts (uuid, org_id, name, description, avatar_url, short_url, author_id, author_name, welcome_message, tools, prompt_starters ) "
+            "VALUES ($gpt.uuid, $gpt.org_id, $gpt.name, $gpt.description, $gpt.avatar_url, $gpt.short_url, $gpt.author_id, $gpt.author_name, $gpt.welcome_message, $tools, $prompt_starters )"
         )
+
+        return 1
 
