@@ -12,7 +12,7 @@ def import_from_gptshunter():
     if gptsList is None or len(gptsList) == 0:
         return {"count":0}
     count = len(gptsList)
-    log.info("get gptsList: count:", count)
+    log.info("get gptsList: count - %d", count)
 
     # save gpts
     insert_count = 0
@@ -27,10 +27,10 @@ def import_from_gptshunter():
             elif result == 2:
                 update_count += 1
         except Exception as e:
-            log.info("save gpt failed", e, gpts.name, gpts.gpt_unique_id)
+            log.info("save gpt failed, e - %s, name - %s, id - %s", e, gpts.name, gpts.id)
             failed_count += 1
    
-    prlog.infoint("save result, insert, update, failed", insert_count, update_count, failed_count)
+    log.info("save result, insert - %d, update - %d, failed - %d", insert_count, update_count, failed_count)
     return {"count": count, "insert_count": insert_count, "update_count": update_count, "failed_count": failed_count}
 
 
@@ -40,7 +40,7 @@ def import_from_gptsworks():
         return {"count": 0}
     
     count = len(gptsList)
-    log.info("get gptsList: count:", count)
+    log.info("get gptsList: count - %d", count)
 
     # save gpts
     insert_count = 0
@@ -55,10 +55,10 @@ def import_from_gptsworks():
             elif result == 2:
                 update_count += 1
         except Exception as e:
-            log.info("save gpt failed", e, gpts.name, gpts.uuid)
+            log.info("save gpt failed, e - %s, name - %s, id - %s", e, gpts.name, gpts.id)
             failed_count += 1
    
-    log.info("save result, insert, update, failed", insert_count, update_count, failed_count)
+    log.info("save result, insert - %d, update - %d, failed - %d", insert_count, update_count, failed_count)
     return {"count": count, "insert_count": insert_count, "update_count": update_count, "failed_count": failed_count}
 
 
@@ -70,7 +70,7 @@ def import_from_gptshub():
         return {"count": 0}
     
     count = len(gptsList)
-    log.info("get gptsList: count:", count)
+    log.info("get gptsList: count - %d", count)
 
     # save gpts
 
@@ -86,13 +86,13 @@ def import_from_gptshub():
                 update_count += 1
 
         except Exception as e:
-            log.info("save gpt failed", e, gpts.name, gpts.id)
+            log.info("save gpt failed, e - %s, name - %s, id - %s", e, gpts.name, gpts.id)
             failed_count += 1
         # i = int(index * 100 / count)
         # print("Download progress: {}%: ".format(i), "▋" * (i // 2), end="")
         # sys.stdout.flush()
 
-    log.info("save result, insert, update, failed", insert_count, update_count, failed_count)
+    log.info("save result, insert - %d, update - %d, failed - %d", insert_count, update_count, failed_count)
     return {"count": count, "insert_count": insert_count, "update_count": update_count, "failed_count": failed_count}
 
 
