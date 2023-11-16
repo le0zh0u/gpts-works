@@ -12,4 +12,4 @@ tst:
 	pm2 start deploy.sh --name gptsindex
 
 tidy:
-	pip freeze > requirements.txt
+	pip list --format=freeze > requirements.txt
