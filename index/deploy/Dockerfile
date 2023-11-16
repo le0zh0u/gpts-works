@@ -6,7 +6,7 @@ COPY ./ ./
 COPY .env.prod .env
 
 RUN pip install --no-cache-dir --upgrade -r requirements.txt
-RUN pip install uvicorn
+RUN pip install PyMySQL, uvicorn
 RUN python -m nltk.downloader -d /tmp/llama_index punkt
 
 EXPOSE 8068
