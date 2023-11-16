@@ -5,7 +5,8 @@ WORKDIR /app
 COPY ./ ./
 COPY .env.prod .env
 
-RUN pip install -r requirements.txt
+RUN pip install --no-cache-dir --upgrade -r requirements.txt
+RUN pip install uvicorn
 RUN python -m nltk.downloader -d /tmp/llama_index punkt
 
 EXPOSE 8068
