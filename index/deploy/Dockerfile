@@ -11,4 +11,4 @@ RUN python -m nltk.downloader -d /tmp/llama_index punkt
 
 EXPOSE 8068
 
-ENTRYPOINT ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8068"]
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8068"]
