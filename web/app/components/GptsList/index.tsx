@@ -1,5 +1,5 @@
 "use client";
-import { Skeleton } from "@/components/ui/skeleton"
+// import { Skeleton } from "@/components/ui/skeleton"
 import { Gpts } from "@/app/types/gpts";
 import { LazyLoadImage } from "react-lazy-load-image-component";
 import Link from "next/link";
@@ -60,31 +60,46 @@ export default ({ gpts, loading }: Props) => {
             })}
           </div>
         ) : (
-          // <div className="mx-auto text-center">
-          <div className="mb-8 gap-5 py-4 [column-count:1] md:mb-12 md:[column-count:2] lg:mb-16 lg:[column-count:3]">
-              <div className="flex items-center space-x-4">
-                <Skeleton className="h-12 w-12 rounded-full" />
-                <div className="space-y-2">
-                  <Skeleton className="h-4 w-[250px]" />
-                  <Skeleton className="h-4 w-[200px]" />
+          // <div className="mx-auto text-center">Loading data...</div>
+          <div className="flex items-center mb-8 gap-5 py-4 [column-count:1] md:mb-12 md:[column-count:2] lg:mb-16 lg:[column-count:3]">
+              <div className="mx-auto flex gap-4 items-center">
+                <div className="skeleton w-16 h-16 rounded-full shrink-0"></div>
+                <div className="flex flex-col gap-4">
+                  <div className="skeleton h-4 w-20"></div>
+                  <div className="skeleton h-4 w-28"></div>
                 </div>
               </div>
-              <div className="flex items-center space-x-4">
-                <Skeleton className="h-12 w-12 rounded-full" />
-                <div className="space-y-2">
-                  <Skeleton className="h-4 w-[250px]" />
-                  <Skeleton className="h-4 w-[200px]" />
+
+              <div className="mx-auto flex gap-4 items-center">
+                <div className="skeleton w-16 h-16 rounded-full shrink-0"></div>
+                <div className="flex flex-col gap-4">
+                  <div className="skeleton h-4 w-20"></div>
+                  <div className="skeleton h-4 w-28"></div>
                 </div>
               </div>
-              <div className="flex items-center space-x-4">
-                <Skeleton className="h-12 w-12 rounded-full" />
-                <div className="space-y-2">
-                  <Skeleton className="h-4 w-[250px]" />
-                  <Skeleton className="h-4 w-[200px]" />
+
+              <div className="mx-auto flex gap-4 items-center">
+                <div className="skeleton w-16 h-16 rounded-full shrink-0"></div>
+                <div className="flex flex-col gap-4">
+                  <div className="skeleton h-4 w-20"></div>
+                  <div className="skeleton h-4 w-28"></div>
                 </div>
               </div>
-            </div>
-          // </div>
+              {/* <div className="flex items-center space-x-4">
+              //   <Skeleton className="h-12 w-12 rounded-full" />
+              //   <div className="space-y-2">
+              //     <Skeleton className="h-4 w-[250px]" />
+              //     <Skeleton className="h-4 w-[200px]" />
+              //   </div>
+              // </div>
+              // <div className="flex items-center space-x-4">
+              //   <Skeleton className="h-12 w-12 rounded-full" />
+              //   <div className="space-y-2">
+              //     <Skeleton className="h-4 w-[250px]" />
+              //     <Skeleton className="h-4 w-[200px]" />
+              //   </div>
+              // </div>*/}
+            </div> 
         )}
       </div>
     </section>

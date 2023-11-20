@@ -13,6 +13,17 @@ export async function POST(req: Request) {
       const params = await req.json();
       const { last_id, limit, tab } = params;
 
+      if (limit > 50) {
+        return Response.json({
+          code: 0,
+          message: "ok",
+          data: {
+            rows: [],
+            count: 0,
+          },
+        });
+      }
+
       const count = await getTotalCount();
 
       if (tab === "latest") {

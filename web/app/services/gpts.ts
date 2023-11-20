@@ -65,6 +65,9 @@ export const searchGpts = async (question: string): Promise<Gpts[]> => {
 
 export function isGptsSensitive(gpts: Gpts): boolean {
   const sensitiveKeywords = process.env.SENSITIVE_KEYWORDS || "";
+  if (sensitiveKeywords == "") {
+    return false  
+  }
   const keywordsArr = sensitiveKeywords.split(",");
   for (let i = 0, l = keywordsArr.length; i < l; i++) {
     const keyword = keywordsArr[i].trim();
