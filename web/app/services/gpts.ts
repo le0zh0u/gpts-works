@@ -54,7 +54,7 @@ export const searchGpts = async (question: string): Promise<Gpts[]> => {
     });
     const res = await resp.json();
     if (res.data) {
-      return res.data;
+      return res.data.filter((gpts: Gpts) => !isGptsSensitive(gpts));
     }
   } catch (e) {
     console.log("request gpts search failed: ", e);
@@ -62,3 +62,64 @@ export const searchGpts = async (question: string): Promise<Gpts[]> => {
 
   return [];
 };
+
+export function isGptsSensitive(gpts: Gpts): boolean {
+  const sensitiveKeywords = process.env.SENSITIVE_KEYWORDS || "";
+  const keywordsArr = sensitiveKeywords.split(",");
+  for (let i = 0, l = keywordsArr.length; i < l; i++) {
+    const keyword = keywordsArr[i].trim();
+    if (
+      (gpts.name && gpts.name.includes(keyword)) ||
+      (gpts.author_name && gpts.author_name.includes(keyword)) ||
+      (gpts.description && gpts.description.includes(keyword))
+    ) {
+      console.log("gpt is sensitive: ", gpts.uuid, gpts.name, keyword);
+      return true;
+    }
+  }
+
+  return false;
+}
+
+export function gptGptsPromptStarters(gpts: Gpts): string[] | undefined {
+  if (gpts.detail) {
+    try {
+      const v = gpts.detail;
+      return v["data"]["gizmo"]["display"]["prompt_starters"];
+    } catch (e) {
+      console.log("parse gpts detail failed: ", e);
+    }
+  }
+
+  return;
+}
+
+export function getGptsWelcomeMessage(gpts: Gpts): string | undefined {
+  if (gpts.detail) {
+    try {
+      const v = gpts.detail;
+      return v["data"]["gizmo"]["display"]["welcome_message"];
+    } catch (e) {
+      console.log("parse gpts detail failed: ", e);
+    }
+  }
+
+  return;
+}
+
+export function getGptsTools(gpts: Gpts): string[] | undefined {
+  if (gpts.detail) {
+    try {
+      const v = gpts.detail;
+      let tools: string[] = [];
+      v["data"]["tools"].forEach((tool: any) => {
+        tools.push(tool["type"]);
+      });
+      return tools;
+    } catch (e) {
+      console.log("parse gpts detail failed: ", e);
+    }
+  }
+
+  return;
+}

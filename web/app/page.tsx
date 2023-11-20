@@ -7,20 +7,23 @@ import { Gpts } from "./types/gpts";
 import GptsList from "./components/GptsList";
 import ProductHunt from "./components/ProductHunt";
 import Search from "./components/Search";
+import Tab from "./components/Tab";
 
 export default () => {
   const [gpts, setGpts] = useState<Gpts[]>([]);
   const [gptsCount, setGptsCount] = useState(0);
   const [loading, setLoading] = useState(false);
+  const [tabValue, setTabValue] = useState("random");
 
-  const fetchGpts = async () => {
+  const fetchGpts = async (tab: string) => {
     const params = {
       last_id: 0,
       limit: 30,
+      tab: tab,
     };
 
     setLoading(true);
-    const resp = await fetch("/api/gptsall", {
+    const resp = await fetch("/api/gpts/all", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -39,17 +42,15 @@ export default () => {
   };
 
   useEffect(() => {
-    if (typeof window !== 'undefined') {
-      // 执行浏览器中的操作
-      fetchGpts();
-    }
-  }, []);
+    fetchGpts(tabValue);
+  }, [tabValue]);
 
   return (
     <>
       <Brand count={gptsCount} />
-      {/* <ProductHunt /> */}
-      {/* <Search setGpts={setGpts} setLoading={setLoading} /> */}
+      {/* <ProductHunt />
+      <Search setGpts={setGpts} setLoading={setLoading} /> */}
+      <Tab tabValue={tabValue} setTabValue={setTabValue} />
       <GptsList gpts={gpts} loading={loading} />
     </>
   );

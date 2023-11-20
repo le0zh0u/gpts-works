@@ -1,7 +1,8 @@
 // import { QueryResultRow, sql } from "@vercel/postgres";
 import mysql from 'mysql2/promise';
 import { RowDataPacket } from 'mysql2';
-import { Gpts } from "../types/gpts";
+import { Gpts } from "@/app/types/gpts";
+import { isGptsSensitive } from "@/app/services/gpts";
 
 const dbConfig = {
   host: process.env.DB_HOST,
@@ -87,31 +88,66 @@ export async function getRows(last_id: number, limit: number): Promise<Gpts[]> {
   
   rows.forEach((row:RowDataPacket) => {
     const gpt = formatGpts(row);
-    gpts.push(gpt);
+    if (gpt) {
+      gpts.push(gpt);
+    }
   });
 
   return gpts;
 }
 
-export async function getRandRows(last_id: number, limit: number): Promise<Gpts[]> {
+// export async function getRandRows(last_id: number, limit: number): Promise<Gpts[]> {
   
+//   const [rows] = await pool.execute(`SELECT * FROM gpts WHERE id > ${last_id} ORDER BY RAND() LIMIT ${limit}`) as RowDataPacket[];
+//   // 使用 rows.length 来判断行数
+//   if (rows.length === 0) {
+//     return [];
+//   }
+
+//   const gpts: Gpts[] = [];
+
+//   rows.forEach((row:RowDataPacket) => {
+//     const gpt = formatGpts(row);
+//     gpts.push(gpt);
+//   });
+
+//   return gpts;
+// }
+
+export async function getRandRows(
+  last_id: number,
+  limit: number
+): Promise<Gpts[]> {
   const [rows] = await pool.execute(`SELECT * FROM gpts WHERE id > ${last_id} ORDER BY RAND() LIMIT ${limit}`) as RowDataPacket[];
-  // 使用 rows.length 来判断行数
-  if (rows.length === 0) {
-    return [];
-  }
-
-  const gpts: Gpts[] = [];
-
-  rows.forEach((row:RowDataPacket) => {
-    const gpt = formatGpts(row);
-    gpts.push(gpt);
-  });
-
-  return gpts;
+  return getGptsFromSqlResult(rows);
 }
 
-export async function getCount(): Promise<number> {
+export async function getLatestRows(
+  last_id: number,
+  limit: number
+): Promise<Gpts[]> {
+  const [rows] = await pool.execute(`SELECT * FROM gpts WHERE id > ${last_id} ORDER BY created_at DESC LIMIT ${limit}`) as RowDataPacket[];
+
+  return getGptsFromSqlResult(rows);
+}
+
+export async function getRecommendedRows(
+  last_id: number,
+  limit: number
+): Promise<Gpts[]> {
+    const [rows] = await pool.execute(`SELECT * FROM gpts WHERE is_recommended=true AND id > ${last_id} ORDER BY sort DESC LIMIT ${limit}`) as RowDataPacket[];
+    return getGptsFromSqlResult(rows);
+}
+
+export async function getHotRows(
+  last_id: number,
+  limit: number
+): Promise<Gpts[]> {
+    const [rows] = await pool.execute(`SELECT * FROM gpts WHERE rating IS NOT null AND id > ${last_id} ORDER BY rating DESC, sort DESC LIMIT ${limit}`) as RowDataPacket[];
+    return getGptsFromSqlResult(rows);
+}
+
+export async function getTotalCount(): Promise<number> {
   // 使用 MySQL 查询语法
   const [rows] = await pool.execute('SELECT COUNT(*) AS count FROM gpts') as RowDataPacket[];
 
@@ -143,8 +179,24 @@ export async function findByUuid(uuid: string): Promise<Gpts | undefined> {
   return gpts;
 }
 
-function formatGpts(row: any): Gpts {
+function getGptsFromSqlResult(rows: RowDataPacket): Gpts[] {
+  if (rows.length === 0) {
+    return [];
+  }
 
+  const gpts: Gpts[] = [];
+  rows.forEach((row:any) => {
+    const gpt = formatGpts(row);
+    if (gpt) {
+      gpts.push(gpt);
+    }
+  });
+
+  return gpts;
+}
+
+function formatGpts(row: any): Gpts | undefined {
+  // console.log("formatGpts:", row)
   var image = row.avatar_url
   if (image && image != "null") {
 
@@ -152,7 +204,7 @@ function formatGpts(row: any): Gpts {
     image = "/logo.png"
   }
 
-  return {
+  const gpts: Gpts = {
     uuid: row.uuid,
     org_id: row.org_id,
     name: row.name,
@@ -161,10 +213,23 @@ function formatGpts(row: any): Gpts {
     short_url: row.short_url,
     author_id: row.author_id,
     author_name: row.author_name,
-    created_at: row.created_at, // 假设这里已经是字符串格式
-    updated_at: row.updated_at, // 假设这里已经是字符串格式
+    created_at: row.created_at,
+    updated_at: row.updated_at,
+    visit_url: row.short_url ? "https://chat.openai.com/g/" + row.short_url : undefined,
+    rating: row.rating,
     detail: row.detail, // 直接使用，假设已经是字符串或 undefined
-    welcome_message: row.welcome_message,
-    visit_url: row.short_url ? "https://chat.openai.com/g/" + row.short_url : undefined
+    welcome_message: row.welcome_message
   };
+
+  // try {
+  //   gpts.detail = JSON.parse(JSON.stringify(row.detail));
+  // } catch (e) {
+  //   console.log("parse gpts detail failed: ", e);
+  // }
+
+  if (isGptsSensitive(gpts)) {
+    return;
+  }
+
+  return gpts;
 }

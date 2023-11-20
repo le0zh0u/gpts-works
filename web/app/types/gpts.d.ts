@@ -12,4 +12,5 @@ export interface Gpts {
   welcome_message: string;
   detail?: string;
   visit_url?: string;
+  rating?: number;
 }
